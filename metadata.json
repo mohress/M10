@@ -1,0 +1,6 @@
+{
+  "name": "Isolated Browser",
+  "description": "A secure, fully isolated multi-profile browser environment designed for managing multiple accounts and preventing session cross-contamination.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
