@@ -27,14 +27,14 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    # 🔥 4. تثبيت أداة Gradle 9.3.1 المطلوبة من قبل مشروعك الحديث تماماً
+    # 4. تثبيت أداة Gradle 9.3.1 المطلوبة من قبل مشروعك الحديث تماماً
     - name: Setup Official Stable Gradle 9.3.1
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '9.3.1'
         disable-wrapper-validation: true
 
-    # 🔥 5. إعادة توليد الـ Wrapper السليم والموثق محلياً داخل السيرفر بإصدار 9.3.1
+    # 5. إعادة توليد الـ Wrapper السليم والموثق محلياً داخل السيرفر بإصدار 9.3.1
     - name: Regenerate Fresh Gradle Wrapper
       run: |
         gradle wrapper --gradle-version 9.3.1 --distribution-type bin
@@ -45,12 +45,21 @@ jobs:
         chmod +x gradlew
         sed -i 's/\r$//' gradlew || true
 
-    # 7. التجميع الفعلي المباشر واستخراج ملف الـ APK للتطبيق
+    # 🔥 7. خطوة ذكية: توليد ملف الـ debug.keystore المفقود تلقائياً لتخطي فحص التوقيع بنجاح
+    - name: Generate Missing Debug Keystore
+      run: |
+        echo "🔑 جاري توليد ملف التوقيع المفقود (debug.keystore) تلقائياً..."
+        keytool -genkey -v -keystore debug.keystore \
+          -storepass android -alias androiddebugkey -keypass android \
+          -keyalg RSA -keysize 2048 -validity 10000 \
+          -dname "CN=Android Debug,O=Android,C=US"
+
+    # 8. التجميع الفعلي المباشر واستخراج ملف الـ APK للتطبيق
     - name: Build Android APK (Debug)
       run: |
         ./gradlew assembleDebug --no-daemon
 
-    # 8. رفع ملف الـ APK النهائي ليكون جاهزاً للتحميل فوراً
+    # 9. رفع ملف الـ APK النهائي ليكون جاهزاً للتحميل فوراً
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
